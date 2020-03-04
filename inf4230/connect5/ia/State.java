@@ -31,7 +31,7 @@ public class State {
 		else {
 			this.j=1;
 		}
-		//this.utility=eval();
+		this.utility=eval();
 	}
 	
 	@Override
@@ -59,8 +59,20 @@ public class State {
 	
 	
 	public boolean terminal() {
+		boolean egal=true;
+		int lignes =g.getData().length;
+    	int col = g.getData()[0].length;
+    	for(int i=0;i<lignes;i++) {
+    		for(int j=0;j<col;j++) {
+    			if(g.get(i, j)==0) {
+    				egal=false;
+    				break;
+    			}
+    		}
+    		
+    	}
     	GrilleVerificateur verif = new GrilleVerificateur();
-    	if(verif.getGagnant(g)!=0) {
+    	if(verif.getGagnant(g)!=0|| egal) {
     		return true;
     	}
     	else {
