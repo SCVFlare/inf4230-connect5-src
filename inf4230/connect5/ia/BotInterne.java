@@ -54,16 +54,19 @@ public class BotInterne implements Joueur {
 
     @Override
     public String getAuteurs() {
-        return "Boyan BECHEV (BECB28049807)  et  Prénom2 Nom2 (CODE00000002)";
+        return "Boyan BECHEV (BECB28049807)  et  Jules JEHANNO (JEHJ22129905)";
     }
     
     private Position minimax(State s) {
     	int v = maxvalue(s);
+    	System.out.println("valueV : " + v);
     	for(State suc: s.succ()) {
     		if (suc.getUtility()==v) {
+    			System.out.println("Position : " + suc.getA().getP());
     			return suc.getA().getP();
     		}
     	}
+    	System.out.print("test");
     	return null;
     }
     
@@ -82,11 +85,12 @@ public class BotInterne implements Joueur {
     	}
     	Integer v = Integer.MIN_VALUE;
     	for(State suc: s.succ()) {
-    		System.out.println("MAX succesors of"+s);
-        	System.out.println(s.getG());
-        	System.out.println(s.succ());
+    		//System.out.println("MAX succesors of"+s);
+        	//System.out.println(s.getG());
+        	//System.out.println(s.succ());
     		v= Math.max(v,minvalue(suc));
     	}
+    	System.out.println("maxValue : " + v);
     	return v;
     }
     private int minvalue(State s) {
@@ -97,16 +101,17 @@ public class BotInterne implements Joueur {
     		int res=s.eval();
     		System.out.println("Terminal:"+s);
         	System.out.println(s.getG());
-    		System.out.println(res);
+        	System.out.println(res);
     		return res;
     	}
     	Integer v = Integer.MAX_VALUE;
     	for(State suc: s.succ()) {
-    		System.out.println("MIN succesors of"+s);
-        	System.out.println(s.getG());
-        	System.out.println(s.succ());
+    		//System.out.println("MIN succesors of"+s);
+        	//System.out.println(s.getG());
+        	//System.out.println(s.succ());
     		v= Math.min(v,maxvalue(suc));
     	}
+    	System.out.println("minValue : " + v);
     	return v;
     	
     }

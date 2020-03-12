@@ -31,7 +31,7 @@ public class State {
 		else {
 			this.j=1;
 		}
-		this.utility=eval();
+		//this.utility=eval();
 	}
 	
 	@Override
@@ -64,7 +64,7 @@ public class State {
     	int col = g.getData()[0].length;
     	for(int i=0;i<lignes;i++) {
     		for(int j=0;j<col;j++) {
-    			if(g.get(i, j)==0) {
+    			if(g.get(i, j)!=1 || g.get(i, j)!=2) {
     				egal=false;
     				break;
     			}
@@ -102,8 +102,8 @@ public class State {
 	
 	public int eval() {
     	//System.out.println("Starting eval");
-		int[] nbGroupes1= {0,0,0,0,0,0};
-		int[] nbGroupes2= {0,0,0,0,0,0};
+		int[] nbGroupes1= {0,0,0,0,0};
+		int[] nbGroupes2= {0,0,0,0,0};
 		int j1=a.getJ();
 		int j2;
 		if(j1==1) {
@@ -176,11 +176,11 @@ public class State {
 		int s4=Math.abs(nbGroupes1[3])-Math.abs(nbGroupes2[3]);
 		int s5=Math.abs(nbGroupes1[4])-Math.abs(nbGroupes2[4]);
 		int res=1*s1 + 10*s2 + 100*s3 + 1000*s4 + 10000*s5;
-		//System.out.println(" evaluating"+this);
-    	//System.out.println(patterns1);
-    	//System.out.println(nbGroupes1);
-    	//System.out.println(patterns2);
-    	//System.out.println(nbGroupes2);
+		System.out.println(" evaluating"+this);
+    	System.out.println(patterns1);
+    	System.out.println(nbGroupes1);
+    	System.out.println(patterns2);
+    	System.out.println(nbGroupes2);
 		return res;
 	}
 	
