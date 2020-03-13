@@ -4,9 +4,11 @@ package inf4230.connect5.ia;
  *
  * Vous pouvez ajouter d'autres classes sous le package inf4230.connect5.ia.
  *
- * Prénom Nom    (CODE00000001)
- * Prénom Nom    (CODE00000002)
+ * Boyan BECHEV   (BECB28049807)
+ * Jules JEHANNO  (JEHJ22129905)
  */
+
+import java.util.List;
 
 import inf4230.connect5.Grille;
 import inf4230.connect5.GrilleVerificateur;
@@ -20,6 +22,7 @@ import inf4230.connect5.Position;
 
 public class BotInterne implements Joueur {
 	private GrilleVerificateur gv= new GrilleVerificateur();
+	private int ns=0;
     //private final Random random = new Random();
 
     /**
@@ -49,15 +52,67 @@ public class BotInterne implements Joueur {
     	int j=joueur(grille);
     	System.out.println("playing as:"+j);
     	State s = new State(grille,j);
-    	return minimax(s);
+    	List<State> initialS=s.succ();
+    	for(State s1: initialS) {
+    		s1.setV(minimax(s1,3,false));
+    	}
+    	//System.out.println(initialS);
+    	State res=initialS.get(0);
+    	for(State s1: initialS) {
+    		res=max(res,s1);
+    	}
+    	//System.out.println(res);
+    	//return v.getA().getP();
+    	return res.getA().getP();
     }
 
     @Override
     public String getAuteurs() {
         return "Boyan BECHEV (BECB28049807)  et  Jules JEHANNO (JEHJ22129905)";
     }
-    
-    private Position minimax(State s) {
+    private int minimax(State s,int depth,boolean maxP) {
+    	if(depth==0 || s.terminal()) {
+    		//s.eval();
+    		return s.eval();
+    	}
+    	if(maxP) {
+    		Integer v=Integer.MIN_VALUE;
+    		//State newS=s;
+    		//newS.setV(Integer.MIN_VALUE);
+    		List<State> succs = s.succ();
+    		for(State suc: succs) {
+        		v= Math.max(v,minimax(suc,depth-1,false));
+        	}
+    		return v;
+    	}
+    	else {
+    		Integer v=Integer.MAX_VALUE;
+    		//State newS=s;
+    		//newS.setV(Integer.MAX_VALUE);
+    		List<State> succs = s.succ();
+    		for(State suc: succs) {
+    			v= Math.min(v,minimax(suc,depth-1,false));
+        	}
+    		return v;
+    	}
+    }
+    private State max(State s1,State s2) {
+    	if(s1.getV()>=s2.getV()) {
+    		return s1;
+    	}
+    	else {
+    		return s2;
+    	}
+    }
+    private State min(State s1,State s2) {
+    	if(s1.getV()<=s2.getV()) {
+    		return s1;
+    	}
+    	else {
+    		return s2;
+    	}
+    }
+    /*private Position minimax(State s) {
     	int v = maxvalue(s);
     	System.out.println("valueV : " + v);
     	for(State suc: s.succ()) {
@@ -71,50 +126,60 @@ public class BotInterne implements Joueur {
     }
     
     private int maxvalue(State s) {
-
+    	System.out.println(ns);
+    	boolean terminal =s.terminal();
     	//System.out.println("get Gagnat: "+gv.getGagnant(s.getG()));
     	//System.out.println("Looking at maxvalue: "+s);
     	//System.out.println("terminnal?: "+s.terminal());
     	//System.out.println(s.getG());
-    	if(s.terminal()) {
+    	if(terminal) {
+    		ns--;
     		int res=s.eval();
-    		System.out.println("Terminal:"+s);
-        	System.out.println(s.getG());
-    		System.out.println(res);
+    		//System.out.println("Terminal:"+s);
+        	//System.out.println(s.getG());
+    		//System.out.println(res);
     		return res;
     	}
     	Integer v = Integer.MIN_VALUE;
-    	for(State suc: s.succ()) {
+    	List<State> succs = s.succ();
+    	ns+=succs.size();
+    	for(State suc: succs) {
     		//System.out.println("MAX succesors of"+s);
         	//System.out.println(s.getG());
         	//System.out.println(s.succ());
     		v= Math.max(v,minvalue(suc));
+    		ns--;
     	}
-    	System.out.println("maxValue : " + v);
+    	//System.out.println("maxValue : " + v);
     	return v;
     }
     private int minvalue(State s) {
-    	
+    	System.out.println(ns);
+    	boolean terminal =s.terminal();
     	//System.out.println("get Gagnat: "+gv.getGagnant(s.getG()));
     	//System.out.println("Looking at minvalue: "+s);
-    	if(s.terminal()) {
+    	if(terminal) {
+    		ns--;
     		int res=s.eval();
-    		System.out.println("Terminal:"+s);
-        	System.out.println(s.getG());
-        	System.out.println(res);
+    		//System.out.println("Terminal:"+s);
+        	//System.out.println(s.getG());
+        	//System.out.println(res);
     		return res;
     	}
     	Integer v = Integer.MAX_VALUE;
-    	for(State suc: s.succ()) {
+    	List<State> succs = s.succ();
+    	ns+=succs.size();
+    	for(State suc: succs) {
     		//System.out.println("MIN succesors of"+s);
         	//System.out.println(s.getG());
         	//System.out.println(s.succ());
     		v= Math.min(v,maxvalue(suc));
+    		ns--;
     	}
-    	System.out.println("minValue : " + v);
+    	//System.out.println("minValue : " + v);
     	return v;
     	
-    }
+    }*/
     private int joueur(Grille g) {
     	int lignes =g.getData().length;
     	int col = g.getData()[0].length;

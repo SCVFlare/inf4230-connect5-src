@@ -12,14 +12,13 @@ import inf4230.connect5.Position;
 public class State {
 	private Grille g;
 	private Action a;
-	private int utility;
+	private int v;
 	private int j;
 	
 	public State(Grille g, int j) {
 		this.g = g;
 		this.a = null;
 		this.j=j;
-		//this.utility=eval();
 	}
 	
 	private State(Grille g, Action a) {
@@ -31,12 +30,11 @@ public class State {
 		else {
 			this.j=1;
 		}
-		//this.utility=eval();
 	}
 	
 	@Override
 	public String toString() {
-		return "State [a=" + a + ", utility=" + utility + ", j=" + j + "]";
+		return "State [a=" + a + ", j=" + j + ", v=" +v+"]"+"\n"+g+"\n";
 	}
 
 	public Action getA() {
@@ -48,15 +46,12 @@ public class State {
 	public void setA(Action a) {
 		this.a = a;
 	}
-
-	public int getUtility() {
-		return utility;
+	public int getV() {
+		return v;
 	}
-
-	public void setUtility(int utility) {
-		this.utility = utility;
+	public void setV(int v) {
+		this.v = v;
 	}
-	
 	
 	public boolean terminal() {
 		boolean egal=true;
@@ -64,12 +59,11 @@ public class State {
     	int col = g.getData()[0].length;
     	for(int i=0;i<lignes;i++) {
     		for(int j=0;j<col;j++) {
-    			if(g.get(i, j)!=1 || g.get(i, j)!=2) {
+    			if(g.get(i, j)==0) {
     				egal=false;
     				break;
     			}
     		}
-    		
     	}
     	GrilleVerificateur verif = new GrilleVerificateur();
     	if(verif.getGagnant(g)!=0|| egal) {
@@ -94,16 +88,13 @@ public class State {
     			}
     		}
     	}
-    	//System.out.println("succs are"+successeurs);
-
     	return successeurs;
     }
 	
 	
 	public int eval() {
-    	//System.out.println("Starting eval");
-		int[] nbGroupes1= {0,0,0,0,0};
-		int[] nbGroupes2= {0,0,0,0,0};
+		int[] nbGroupes1= {0,0,0,0,0,0};
+		int[] nbGroupes2= {0,0,0,0,0,0};
 		int j1=a.getJ();
 		int j2;
 		if(j1==1) {
@@ -164,7 +155,6 @@ public class State {
 			int s = p1.size();
 			nbGroupes1[s-1]++;
 		}
-    	//System.out.println(patterns2);
 		for(Set<Integer> p2:patterns2) {
 
 			int s = p2.size();
@@ -175,12 +165,13 @@ public class State {
 		int s3=Math.abs(nbGroupes1[2])-Math.abs(nbGroupes2[2]);
 		int s4=Math.abs(nbGroupes1[3])-Math.abs(nbGroupes2[3]);
 		int s5=Math.abs(nbGroupes1[4])-Math.abs(nbGroupes2[4]);
-		int res=1*s1 + 10*s2 + 100*s3 + 1000*s4 + 10000*s5;
-		System.out.println(" evaluating"+this);
+		int s6=Math.abs(nbGroupes1[5])-Math.abs(nbGroupes2[5]);
+		int res=1*s1 + 10*s2 + 100*s3 + 1000*s4 + 10000*s5+100000*s6;
+		/*System.out.println(" evaluating"+this+"\n"+this.g+res);
     	System.out.println(patterns1);
     	System.out.println(nbGroupes1);
     	System.out.println(patterns2);
-    	System.out.println(nbGroupes2);
+    	System.out.println(nbGroupes2);*/
 		return res;
 	}
 	
