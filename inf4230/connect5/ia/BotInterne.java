@@ -50,18 +50,54 @@ public class BotInterne implements Joueur {
         choix = casesvides.get(choix);
         return new Position(choix / nbcol, choix % nbcol);*/
     	int j=joueur(grille);
-    	System.out.println("playing as:"+j);
+    	//System.out.println("playing as:"+j);
     	State s = new State(grille,j);
+    	double stopDelais = delais*0.80;
+    	long start = System.currentTimeMillis();
+       
+       
+    	/*
+    	// VERSION Minimax classique
     	List<State> initialS=s.succ();
     	for(State s1: initialS) {
-    		s1.setV(minimax(s1,3,false));
+    		s1.setV(minimax(s1,1,false,inverseP(j)));
     	}
     	//System.out.println(initialS);
     	State res=initialS.get(0);
     	for(State s1: initialS) {
     		res=max(res,s1);
     	}
-    	//System.out.println(res);
+    	System.out.println(res);
+    	//return v.getA().getP();
+    	return res.getA().getP();
+    	*/
+    	
+    	/* VERSION Minimax avec élagage alpha beta
+    	Action a = alphaBeta(s, inverseP(j));
+    	System.out.println("First action : " + a);
+    	while (a.getParent() != null) {
+    		a = a.getParent();
+    	}
+    	//System.out.println(grille);
+    	return a.getP();
+    	*/
+    	
+    	// VERSION Minimax avec negamax
+    	List<State> initialS=s.succ();
+    	for(State s1: initialS) {
+    		s1.setV(negamax(s1, Integer.MIN_VALUE, Integer.MAX_VALUE, inverseP(j), 0));
+    		long stop = System.currentTimeMillis();
+    	    int duree = (int) (stop - start);
+    	    if (duree >= stopDelais) {
+    	    	break;
+    	    }
+    	}
+    	//System.out.println(initialS);
+    	State res=initialS.get(0);
+    	for(State s1: initialS) {
+    		res=max(res,s1);
+    	}
+    	System.out.println(res);
     	//return v.getA().getP();
     	return res.getA().getP();
     }
@@ -70,10 +106,10 @@ public class BotInterne implements Joueur {
     public String getAuteurs() {
         return "Boyan BECHEV (BECB28049807)  et  Jules JEHANNO (JEHJ22129905)";
     }
-    private int minimax(State s,int depth,boolean maxP) {
+    private int minimax(State s,int depth,boolean maxP, int player) {
     	if(depth==0 || s.terminal()) {
-    		//s.eval();
-    		return s.eval();
+    		int res =s.eval(player); //s.eval();
+    		return res;
     	}
     	if(maxP) {
     		Integer v=Integer.MIN_VALUE;
@@ -81,7 +117,7 @@ public class BotInterne implements Joueur {
     		//newS.setV(Integer.MIN_VALUE);
     		List<State> succs = s.succ();
     		for(State suc: succs) {
-        		v= Math.max(v,minimax(suc,depth-1,false));
+        		v= Math.max(v,minimax(suc,depth-1,false,inverseP(player)));
         	}
     		return v;
     	}
@@ -91,7 +127,7 @@ public class BotInterne implements Joueur {
     		//newS.setV(Integer.MAX_VALUE);
     		List<State> succs = s.succ();
     		for(State suc: succs) {
-    			v= Math.min(v,minimax(suc,depth-1,false));
+    			v= Math.min(v,minimax(suc,depth-1,true,inverseP(player)));
         	}
     		return v;
     	}
@@ -112,6 +148,99 @@ public class BotInterne implements Joueur {
     		return s2;
     	}
     }
+    private int inverseP(int player) {
+    	if (player == 1) {
+    		return 2;
+    	}
+    	else return 1;
+    }
+    
+    
+    // AVEC ELAGAGE ALPHA BETA
+    private Action alphaBeta(State s, int player) {
+    	int v = maxValue(s,Integer.MIN_VALUE, Integer.MAX_VALUE, player, 0);
+    	System.out.println("maxValue found : " + v);
+    	
+    	for (State succ : s.succ()) {
+    		if (succ.getV() == v) {
+    			return succ.getA();
+    		}
+    	}
+    	
+    	System.out.println("Case null");
+    	
+    	State max = (s.succ()).get(0);
+    	for (State succ : s.succ()) {
+    		if (succ.getV() > max.getV()) {
+    			max = succ;
+    		}
+    	}
+    	
+    	return max.getA();
+    }
+    
+    private int maxValue(State s, int alpha, int beta, int player, int depth) {
+    	if (depth > 3 || s.terminal()) {
+    		//System.out.println("State is terminal (max) : " + s.eval(player));
+    		return s.eval(player);
+    	}
+    	int v = Integer.MIN_VALUE;
+    	
+    	for (State succ : s.succ()) {
+    		v = Integer.max(v, minValue(succ, alpha, beta, inverseP(player), depth+1));
+    		succ.setV(v);
+    		if (v >= beta) {
+    			//System.out.println("Élagage done");
+    			return v;
+    		}
+    		alpha = Integer.max(alpha,v);
+    	}
+    	return v;
+    }
+    
+    private int minValue(State s, int alpha, int beta, int player, int depth) {
+    	if (depth > 3 || s.terminal()) {
+    		//System.out.println("State is terminal (min) : " + s.eval(player));
+    		return s.eval(player);
+    	}
+    	int v = Integer.MAX_VALUE;
+    	
+    	for (State succ : s.succ()) {
+    		v = Integer.min(v, maxValue(succ, alpha, beta, inverseP(player), depth+1));
+    		succ.setV(v);
+    		if (v <= alpha) {
+    			//System.out.println("Élagage done");
+    			return v;
+    		}
+    		beta = Integer.min(beta,v);
+    	}
+    	return v;
+    }
+    
+    // NEGAMAX
+    private int negamax(State s, int alpha, int beta, int player, int depth) {
+    	if (depth > 3 || s.terminal()) {
+    		return s.eval(player);
+    	}
+    	else {
+    		int best = Integer.MIN_VALUE;
+    		int v = 0;
+    		for (State succ : s.succ()) {
+    			v = -negamax(succ, -beta, -alpha, inverseP(player), depth+1);
+    			if (v > best) {
+    				best = v;
+    				if (best > alpha) {
+    					alpha = best;
+    					if (alpha >= beta) {
+    						return best;
+    					}
+    				}
+    			}
+    		}
+    		return best;
+    	}
+    }
+    
     /*private Position minimax(State s) {
     	int v = maxvalue(s);
     	System.out.println("valueV : " + v);

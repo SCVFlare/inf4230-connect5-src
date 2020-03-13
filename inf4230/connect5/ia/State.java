@@ -15,10 +15,12 @@ public class State {
 	private int v;
 	private int j;
 	
+	
 	public State(Grille g, int j) {
 		this.g = g;
 		this.a = null;
 		this.j=j;
+		
 	}
 	
 	private State(Grille g, Action a) {
@@ -30,6 +32,7 @@ public class State {
 		else {
 			this.j=1;
 		}
+		
 	}
 	
 	@Override
@@ -52,6 +55,8 @@ public class State {
 	public void setV(int v) {
 		this.v = v;
 	}
+	
+	
 	
 	public boolean terminal() {
 		boolean egal=true;
@@ -83,7 +88,9 @@ public class State {
     			if(g.get(i, j)==0) {
     				Grille gnew=g.clone();
     				gnew.set(i, j, this.j);
-    				State snew= new State(gnew, new Action(this.j,new Position(i,j)));
+    				State snew= new State(gnew, new Action(this.j,new Position(i,j),this.getA()));
+    				
+    				
     				successeurs.add(snew);
     			}
     		}
@@ -92,10 +99,10 @@ public class State {
     }
 	
 	
-	public int eval() {
-		int[] nbGroupes1= {0,0,0,0,0,0};
-		int[] nbGroupes2= {0,0,0,0,0,0};
-		int j1=a.getJ();
+	public int eval(int player) {
+		int[] nbGroupes1= {0,0,0,0,0,0,0,0,0};
+		int[] nbGroupes2= {0,0,0,0,0,0,0,0,0};
+		int j1=player;
 		int j2;
 		if(j1==1) {
 			j2=2;
@@ -166,7 +173,10 @@ public class State {
 		int s4=Math.abs(nbGroupes1[3])-Math.abs(nbGroupes2[3]);
 		int s5=Math.abs(nbGroupes1[4])-Math.abs(nbGroupes2[4]);
 		int s6=Math.abs(nbGroupes1[5])-Math.abs(nbGroupes2[5]);
-		int res=1*s1 + 10*s2 + 100*s3 + 1000*s4 + 10000*s5+100000*s6;
+		int s7=Math.abs(nbGroupes1[6])-Math.abs(nbGroupes2[6]);
+		int s8=Math.abs(nbGroupes1[7])-Math.abs(nbGroupes2[7]);
+		int s9=Math.abs(nbGroupes1[8])-Math.abs(nbGroupes2[8]);
+		int res=1*s1 + 10*s2 + 100*s3 + 1000*s4 + 10000*s5;
 		/*System.out.println(" evaluating"+this+"\n"+this.g+res);
     	System.out.println(patterns1);
     	System.out.println(nbGroupes1);
