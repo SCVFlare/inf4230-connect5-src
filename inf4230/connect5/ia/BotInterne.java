@@ -22,7 +22,7 @@ import inf4230.connect5.Position;
 
 public class BotInterne implements Joueur {
 	private GrilleVerificateur gv= new GrilleVerificateur();
-	private int ns=0;
+	private static boolean searchCutoff = false;
     //private final Random random = new Random();
 
     /**
@@ -49,13 +49,17 @@ public class BotInterne implements Joueur {
         int choix = random.nextInt(casesvides.size());
         choix = casesvides.get(choix);
         return new Position(choix / nbcol, choix % nbcol);*/
+    	//long startTime = System.currentTimeMillis();
+		//long stopTime = delais+startTime;
     	int j=joueur(grille);
     	//System.out.println("playing as:"+j);
     	State s = new State(grille,j);
-    	double stopDelais = delais*0.80;
-    	long start = System.currentTimeMillis();
+    	int res=0;
+    	res=iterativeDeepeningSearch(s,delais,j);
+    	System.out.println(res);
+    	//long start = System.currentTimeMillis();
        
-       
+
     	/*
     	// VERSION Minimax classique
     	List<State> initialS=s.succ();
@@ -83,23 +87,19 @@ public class BotInterne implements Joueur {
     	*/
     	
     	// VERSION Minimax avec negamax
-    	List<State> initialS=s.succ();
-    	for(State s1: initialS) {
-    		s1.setV(negamax(s1, Integer.MIN_VALUE, Integer.MAX_VALUE, inverseP(j), 0));
-    		long stop = System.currentTimeMillis();
-    	    int duree = (int) (stop - start);
-    	    if (duree >= stopDelais) {
-    	    	break;
-    	    }
-    	}
+    	
+    	//List<State> initialS=s.succ();
+    	//for(State s1: initialS) {
+    	//	s1.setV(iterativeDeepeningSearch(s1,delais,inverseP(j)));
+    	//}
     	//System.out.println(initialS);
-    	State res=initialS.get(0);
-    	for(State s1: initialS) {
-    		res=max(res,s1);
-    	}
-    	System.out.println(res);
+    	//State res=initialS.get(0);
+    	//for(State s1: initialS) {
+    	//	res=max(res,s1);
+    	//}
+    	//System.out.println(res);
     	//return v.getA().getP();
-    	return res.getA().getP();
+    	return null;
     }
 
     @Override
@@ -217,26 +217,62 @@ public class BotInterne implements Joueur {
     	return v;
     }
     
+    //Iterative deepening
+    private int iterativeDeepeningSearch(State state, long timeLimit,int player) {
+		long startTime = System.currentTimeMillis();
+		long endTime = startTime + timeLimit;
+		int depth = 1;
+		int score= 0;
+		searchCutoff = false;
+		while (true) {
+			long currentTime = System.currentTimeMillis();
+			if (currentTime >= endTime) {
+				break;
+			}
+			int searchResult = negamax(state, Integer.MIN_VALUE, Integer.MAX_VALUE,player, depth, currentTime, endTime - currentTime);
+
+			if (!searchCutoff) {
+				score=searchResult;
+			}
+			
+			depth++;
+		}
+		state.setV(score);
+		return score;
+	}
+    
+    
+    
+    
     // NEGAMAX
-    private int negamax(State s, int alpha, int beta, int player, int depth) {
-    	if (depth > 3 || s.terminal()) {
-    		return s.eval(player);
+    private int negamax(State s, int alpha, int beta, int player, int depth, long start, long limit) {
+    	long current = System.currentTimeMillis();
+		long elapsed = (current - start);
+    	if (elapsed >= limit) {
+			searchCutoff = true;
+		}
+    	if (depth ==0 || s.terminal()||searchCutoff) {
+    		int res = s.eval(player);
+    		s.setV(res);
+    		return res;
     	}
     	else {
     		int best = Integer.MIN_VALUE;
     		int v = 0;
     		for (State succ : s.succ()) {
-    			v = -negamax(succ, -beta, -alpha, inverseP(player), depth+1);
+    			v = -negamax(succ, -beta, -alpha, inverseP(player), depth-1,start,limit);
     			if (v > best) {
     				best = v;
     				if (best > alpha) {
     					alpha = best;
     					if (alpha >= beta) {
+    						succ.setV(best);
     						return best;
     					}
     				}
     			}
     		}
+    		s.setV(best);
     		return best;
     	}
     }

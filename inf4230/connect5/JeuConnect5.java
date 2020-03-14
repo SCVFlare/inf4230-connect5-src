@@ -157,7 +157,7 @@ public class JeuConnect5 implements Runnable {
     public static void main(String args[]) throws Exception {
         BotInterne j1 = new BotInterne();
         BotInterne j2 = new BotInterne();
-        JeuConnect5 gp = new JeuConnect5(j1, j2, 8, 8);
+        JeuConnect5 gp = new JeuConnect5(j1, j2, 16, 16);
         gp.run();
         System.out.println("Gagnant:" + gp.gagnant);
     }
