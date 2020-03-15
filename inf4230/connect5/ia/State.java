@@ -85,9 +85,13 @@ public class State {
     			if(g.get(i, j)==0) {
     				Grille gnew=g.clone();
     				gnew.set(i, j, this.j);
-    				//State snew= new State(gnew, a);
-
-    				State snew= new State(gnew, new Action(this.j,new Position(i,j),this.getA()));
+    				State snew;
+    				if(this.a==null) {
+    					snew=new State(gnew,new Action(this.j,new Position(i,j)));
+    				}
+    				else {
+    					snew= new State(gnew, new Action(this.j,this.a.getP()));
+    				}
     				
     				
     				successeurs.add(snew);
