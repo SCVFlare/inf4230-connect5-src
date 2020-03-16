@@ -62,7 +62,7 @@ public class State {
 	}
 	
 	
-	
+
 	public boolean terminal() {
 		boolean egal=true;
 		int lignes =g.getData().length;
@@ -94,14 +94,8 @@ public class State {
     				Grille gnew=g.clone();
     				gnew.set(i, j, this.j);
     				State snew;
-    				//if(this.a==null) {
-    					snew=new State(gnew,new Action(this.j,new Position(i,j)));
-    					snew.setParent(this);
-    				//}
-    				//else {
-    					//snew= new State(gnew, new Action(this.j,this.a.getP()));
-    				//}
-    				
+    				snew=new State(gnew,new Action(this.j,new Position(i,j)));
+    				snew.setParent(this);
     				
     				successeurs.add(snew);
     			}
