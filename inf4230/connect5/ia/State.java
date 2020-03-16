@@ -14,11 +14,17 @@ public class State {
 	private Action a;
 	private int v;
 	private int j;
+	private State parent;
+	
+	private Set<Set<Integer>> paterns = new HashSet<Set<Integer>>();
+	private int eval = -1;
 	
 	public State(Grille g, int j) {
 		this.g = g;
 		this.a = null;
 		this.j=j;
+		
+		setParent(null);
 	}
 	
 	private State(Grille g, Action a) {
@@ -30,6 +36,8 @@ public class State {
 		else {
 			this.j=1;
 		}
+		
+		setParent(null);
 	}
 	
 	@Override
@@ -86,12 +94,13 @@ public class State {
     				Grille gnew=g.clone();
     				gnew.set(i, j, this.j);
     				State snew;
-    				if(this.a==null) {
+    				//if(this.a==null) {
     					snew=new State(gnew,new Action(this.j,new Position(i,j)));
-    				}
-    				else {
-    					snew= new State(gnew, new Action(this.j,this.a.getP()));
-    				}
+    					snew.setParent(this);
+    				//}
+    				//else {
+    					//snew= new State(gnew, new Action(this.j,this.a.getP()));
+    				//}
     				
     				
     				successeurs.add(snew);
@@ -179,12 +188,18 @@ public class State {
 		int s7=Math.abs(nbGroupes1[6])-Math.abs(nbGroupes2[6]);
 		int s8=Math.abs(nbGroupes1[7])-Math.abs(nbGroupes2[7]);
 		int s9=Math.abs(nbGroupes1[8])-Math.abs(nbGroupes2[8]);
-		int res=1*s1 + 10*s2 + 100*s3 + 1000*s4 + 10000*s5;
+		int res=1*s1 + 10*s2 + 100*s3 + 1000*s4 + 10000*s5 + 10000*s6 + 10000*s7 + 10000*s8 + 10000*s9;
 		/*System.out.println(" evaluating"+this+"\n"+this.g+res);
     	System.out.println(patterns1);
     	System.out.println(nbGroupes1);
     	System.out.println(patterns2);
     	System.out.println(nbGroupes2);*/
+		
+		if (res >= eval) {
+			setPaterns(patterns1);
+			eval = res;
+			//System.out.println("Joueur j1 : " + j1 + " / Joueur j2 : " + j2 + " : res = " + res + " pos : " + this.a);
+		}
 		return res;
 	}
 	
@@ -271,5 +286,29 @@ public class State {
         }
         catch(Exception e){
         }
+	}
+
+	public Set<Set<Integer>> getPaterns() {
+		return paterns;
+	}
+
+	public void setPaterns(Set<Set<Integer>> paterns) {
+		this.paterns = paterns;
+	}
+
+	public int getEval() {
+		return eval;
+	}
+
+	public void setEval(int eval) {
+		this.eval = eval;
+	}
+
+	public State getParent() {
+		return parent;
+	}
+
+	public void setParent(State parent) {
+		this.parent = parent;
 	}
 }

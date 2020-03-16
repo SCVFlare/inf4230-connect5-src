@@ -55,6 +55,9 @@ public class BotInterne implements Joueur {
     	//System.out.println("playing as:"+j);
     	State s = new State(grille,j);
     	State res=iterativeDeepeningSearch(s,delais,j);
+    	//while (res.getParent().getParent() != null) {
+    		//res = res.getParent();
+    	//}
     	//System.out.println(res);
     	//long start = System.currentTimeMillis();
        
@@ -236,6 +239,8 @@ public class BotInterne implements Joueur {
 			
 			depth++;
 		}
+		//System.out.println("FINAL :");
+		System.out.println("res = " + score.eval(player) + " / pos = " + score.getA().getP() + " / patterns = " + score.getPaterns());
 		return score;
 	}
     
